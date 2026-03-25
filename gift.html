@@ -356,9 +356,6 @@
           <div class="result-sub" id="resultSub">看看今天送给贾银珠什么惊喜。</div>
         </div>
 
-        <div class="share-box">
-          <div class="share-title">直接发送方式</div>
-          <div class="share-tip">把这个文件保存成 <b>gift.html</b>，然后通过微信“文件”发给她。她下载后点开，用手机浏览器打开就能玩。同一设备同一浏览器只允许抽一次。</div>
         </div>
       </div>
     </div>
@@ -548,7 +545,6 @@
       isDrawn = true;
       const storedResult = getStoredDrawResult();
       resultMain.textContent = storedResult || "本设备已抽过一次";
-      resultSub.textContent = "关闭后再打开也不会恢复次数。";
       updateButtonState();
     }
 
