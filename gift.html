@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>给贾银珠的小惊喜</title>
+  <style>
+    :root {
+      --bg1: #fff1f2;
+      --bg2: #fdf2f8;
+      --bg3: #f5d0fe;
+      --rose: #f43f5e;
+      --rose-dark: #e11d48;
+      --text: #334155;
+      --muted: #64748b;
+      --card: rgba(255,255,255,0.84);
+      --shadow: 0 18px 50px rgba(244,114,182,0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2) 45%, var(--bg3));
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+    body { overflow-x: hidden; }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card {
+      width: min(100%, 430px);
+      border-radius: 28px;
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.7);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .inner {
+      position: relative;
+      overflow: hidden;
+      padding: 20px 16px 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,241,242,0.9));
+    }
+
+    .hero {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(244,63,94,0.1);
+      color: var(--rose-dark);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.25;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .anniversary {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.72);
+      color: var(--rose-dark);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(244,63,94,0.08);
+    }
+
+    .wheel-wrap {
+      position: relative;
+      z-index: 2;
+      margin-top: 22px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -5px;
+      z-index: 5;
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 28px solid var(--rose);
+      filter: drop-shadow(0 4px 8px rgba(244,63,94,0.25));
+    }
+
+    .wheel {
+      width: 292px;
+      height: 292px;
+      border-radius: 50%;
+      border: 8px solid rgba(255,255,255,0.95);
+      box-shadow: 0 18px 35px rgba(148,163,184,0.18);
+      position: relative;
+      transform: rotate(0deg);
+      background: conic-gradient(
+        #fda4af 0deg 40deg,
+        #f9a8d4 40deg 80deg,
+        #c4b5fd 80deg 120deg,
+        #93c5fd 120deg 160deg,
+        #86efac 160deg 200deg,
+        #fde68a 200deg 240deg,
+        #fdba74 240deg 280deg,
+        #fca5a5 280deg 320deg,
+        #fbcfe8 320deg 360deg
+      );
+    }
+
+    .segment-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 92px;
+      text-align: center;
+      transform-origin: center center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .segment-label span { display: block; }
+
+    .center-badge {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: #fff;
+      border: 6px solid rgba(244,63,94,0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--rose-dark);
+      box-shadow: 0 10px 24px rgba(244,63,94,0.16);
+      z-index: 4;
+    }
+
+    .controls {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .2s ease, background .2s ease;
+    }
+    button:active { transform: scale(0.98); }
+
+    .primary {
+      background: linear-gradient(180deg, #fb7185, var(--rose));
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(244,63,94,0.22);
+    }
+    .primary[disabled] {
+      opacity: 0.72;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .secondary {
+      background: rgba(255,255,255,0.9);
+      color: var(--rose-dark);
+      border: 1px solid rgba(244,63,94,0.14);
+    }
+
+    .result-box {
+      position: relative;
+      z-index: 2;
+      margin-top: 14px;
+      padding: 16px 14px;
+      border-radius: 22px;
+      background: rgba(255,241,242,0.9);
+      border: 1px solid rgba(244,63,94,0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+      text-align: center;
+    }
+    .result-title {
+      font-size: 14px;
+      color: var(--rose);
+      font-weight: 700;
+    }
+    .result-main {
+      margin-top: 8px;
+      min-height: 40px;
+      font-size: 28px;
+      color: var(--rose-dark);
+      font-weight: 800;
+    }
+    .result-sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .heart-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .heart {
+      position: absolute;
+      bottom: 6%;
+      opacity: 0;
+      color: rgba(244,63,94,0.78);
+      line-height: 1;
+      animation-name: heartFloat;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform, opacity;
+      text-shadow: 0 0 8px rgba(251,113,133,0.15);
+    }
+
+    .burst-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      overflow: hidden;
+    }
+    .bubble {
+      position: absolute;
+      left: 50%;
+      top: 18%;
+      border-radius: 50%;
+      opacity: 0;
+      transform: translate(0, 0) scale(0.2);
+      will-change: transform, opacity;
+    }
+    .bubble.show {
+      animation: bubbleBurst .72s ease-out forwards;
+    }
+
+    .share-box {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.68);
+      border: 1px dashed rgba(244,63,94,0.2);
+      position: relative;
+      z-index: 2;
+    }
+    .share-title {
+      font-size: 13px;
+      color: var(--rose-dark);
+      font-weight: 700;
+    }
+    .share-tip {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @keyframes heartFloat {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 0.82; }
+      85% { opacity: 0.82; }
+      100% { transform: translateY(-72vh); opacity: 0; }
+    }
+
+    @keyframes bubbleBurst {
+      0% { opacity: 0.95; transform: translate(0, 0) scale(0.25); }
+      100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.15); }
+    }
+
+    @media (max-width: 360px) {
+      .inner { padding: 18px 12px 16px; }
+      .wheel { width: 268px; height: 268px; }
+      .segment-label { width: 86px; font-size: 11px; }
+      .hero h1 { font-size: 24px; }
+      .result-main { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="inner">
+        <div class="heart-layer" id="heartLayer"></div>
+        <div class="burst-layer" id="burstLayer"></div>
+
+        <div class="hero">
+          <div class="badge">💖 给贾银珠的专属抽奖</div>
+          <h1>今天的小惊喜等你来抽</h1>
+          <p>每次只能抽一个，抽中后自动锁定。</p>
+          <div class="anniversary">📅 纪念日：2026年2月7日</div>
+        </div>
+
+        <div class="wheel-wrap">
+          <div class="pointer"></div>
+          <div class="wheel" id="wheel">
+            <div class="center-badge">银珠</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="primary" id="spinBtn">开始抽奖</button>
+          <button class="secondary" id="resetBtn">重新开始</button>
+        </div>
+
+        <div class="result-box">
+          <div class="result-title">抽奖结果</div>
+          <div class="result-main" id="resultMain">点击开始抽奖</div>
+          <div class="result-sub" id="resultSub">看看今天送给贾银珠什么惊喜。</div>
+        </div>
+
+        <div class="share-box">
+          <div class="share-title">直接发送方式</div>
+          <div class="share-tip">把这个文件保存成 <b>gift.html</b>，然后通过微信“文件”发给她。她下载后点开，用手机浏览器打开就能玩。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GIFTS = [
+      "喝奶茶",
+      "公园散步",
+      "给我刮胡子",
+      "惊喜小零食",
+      "晚安电话",
+      "小花一束",
+      "看电影",
+      "一起玩游戏",
+      "指定小礼物"
+    ];
+
+    const SPIN_DURATION_MS = 5000;
+    const HEARTS = [
+      { left: "14%", delay: 0, duration: 7.8, size: 16 },
+      { left: "30%", delay: 1.2, duration: 8.1, size: 18 },
+      { left: "48%", delay: 2.1, duration: 7.6, size: 15 },
+      { left: "67%", delay: 0.8, duration: 8.2, size: 17 },
+      { left: "84%", delay: 1.7, duration: 7.9, size: 16 }
+    ];
+
+    function assert(condition, message) {
+      if (!condition) throw new Error("Test failed: " + message);
+    }
+
+    function getWinnerIndex(count) {
+      return Math.floor(Math.random() * count);
+    }
+
+    function buildBubbleOffsets(count) {
+      return Array.from({ length: count }, (_, i) => {
+        const angle = Math.PI * (0.9 + (i / Math.max(count - 1, 1)) * 1.2);
+        const radius = 36 + (i % 2) * 14;
+        return {
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius - 28,
+          size: i % 3 === 0 ? 10 : 7,
+          delay: i * 0.02
+        };
+      });
+    }
+
+    function runTests() {
+      assert(Array.isArray(GIFTS) && GIFTS.length > 1, "gift list should contain at least two items");
+      assert(GIFTS.includes("一起玩游戏"), "gift list should include 一起玩游戏");
+      const winner = getWinnerIndex(GIFTS.length);
+      assert(winner >= 0 && winner < GIFTS.length, "winner index should stay within range");
+      const offsets = buildBubbleOffsets(8);
+      assert(offsets.length === 8, "bubble offsets should match requested count");
+      assert(typeof offsets[0].x === "number" && typeof offsets[0].y === "number", "bubble offsets should contain numeric positions");
+      assert(document.getElementById("wheel"), "wheel element should exist");
+    }
+
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spinBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const resultMain = document.getElementById("resultMain");
+    const resultSub = document.getElementById("resultSub");
+    const heartLayer = document.getElementById("heartLayer");
+    const burstLayer = document.getElementById("burstLayer");
+
+    let rotation = 0;
+    let isSpinning = false;
+    let isDrawn = false;
+    let timerId = null;
+
+    function renderLabels() {
+      GIFTS.forEach((gift, index) => {
+        const angle = (360 / GIFTS.length) * index + (360 / GIFTS.length) / 2;
+        const label = document.createElement("div");
+        label.className = "segment-label";
+        label.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateY(-108px)`;
+
+        const inner = document.createElement("span");
+        inner.style.transform = `rotate(${-angle}deg)`;
+        inner.textContent = gift;
+
+        label.appendChild(inner);
+        wheel.appendChild(label);
+      });
+    }
+
+    function renderHearts() {
+      HEARTS.forEach((heart) => {
+        const el = document.createElement("div");
+        el.className = "heart";
+        el.textContent = "❤";
+        el.style.left = heart.left;
+        el.style.fontSize = `${heart.size}px`;
+        el.style.animationDelay = `${heart.delay}s`;
+        el.style.animationDuration = `${heart.duration}s`;
+        heartLayer.appendChild(el);
+      });
+    }
+
+    function showBurst() {
+      burstLayer.innerHTML = "";
+      const bubbles = buildBubbleOffsets(8);
+
+      bubbles.forEach((bubble, index) => {
+        const el = document.createElement("span");
+        el.className = "bubble show";
+        el.style.width = `${bubble.size}px`;
+        el.style.height = `${bubble.size}px`;
+        el.style.background = "rgba(251, 207, 232, 0.85)";
+        el.style.setProperty("--x", `${bubble.x}px`);
+        el.style.setProperty("--y", `${bubble.y}px`);
+        el.style.animationDelay = `${bubble.delay}s`;
+        burstLayer.appendChild(el);
+
+        if (index < 4) {
+          const white = document.createElement("span");
+          white.className = "bubble show";
+          white.style.width = "5px";
+          white.style.height = "5px";
+          white.style.background = "rgba(255, 255, 255, 0.92)";
+          white.style.setProperty("--x", `${bubble.x * 0.82}px`);
+          white.style.setProperty("--y", `${bubble.y * 0.82}px`);
+          white.style.animationDelay = `${0.03 + bubble.delay}s`;
+          burstLayer.appendChild(white);
+        }
+      });
+
+      window.setTimeout(() => {
+        burstLayer.innerHTML = "";
+      }, 900);
+    }
+
+    function updateButtonState() {
+      spinBtn.disabled = isSpinning || isDrawn;
+      spinBtn.textContent = isSpinning ? "正在抽奖..." : isDrawn ? "本轮已抽完" : "开始抽奖";
+    }
+
+    function spin() {
+      if (isSpinning || isDrawn) return;
+
+      const winnerIndex = getWinnerIndex(GIFTS.length);
+      const segmentAngle = 360 / GIFTS.length;
+      const targetAngle = 360 - (winnerIndex * segmentAngle + segmentAngle / 2);
+      const nextRotation = rotation + 360 * 5 + targetAngle;
+
+      isSpinning = true;
+      resultMain.textContent = "抽奖中...";
+      resultSub.textContent = "小惊喜正在赶来。";
+      updateButtonState();
+
+      wheel.style.transition = `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+      wheel.style.transform = `rotate(${nextRotation}deg)`;
+      rotation = nextRotation;
+
+      if (timerId !== null) {
+        window.clearTimeout(timerId);
+      }
+
+      timerId = window.setTimeout(() => {
+        isSpinning = false;
+        isDrawn = true;
+        resultMain.textContent = `抽中：${GIFTS[winnerIndex]}`;
+        resultSub.textContent = "今天给贾银珠的小浪漫已经决定好啦。";
+        updateButtonState();
+        showBurst();
+      }, SPIN_DURATION_MS);
+    }
+
+    function reset() {
+      if (timerId !== null) {
+        window.clearTimeout(timerId);
+        timerId = null;
+      }
+      isSpinning = false;
+      isDrawn = false;
+      rotation = 0;
+      wheel.style.transition = "none";
+      wheel.style.transform = "rotate(0deg)";
+      resultMain.textContent = "点击开始抽奖";
+      resultSub.textContent = "看看今天送给贾银珠什么惊喜。";
+      burstLayer.innerHTML = "";
+      updateButtonState();
+    }
+
+    spinBtn.addEventListener("click", spin);
+    resetBtn.addEventListener("click", reset);
+
+    renderLabels();
+    renderHearts();
+    updateButtonState();
+    runTests();
+  </script>
+</body>
+</html>
