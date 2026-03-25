@@ -335,7 +335,7 @@
         <div class="hero">
           <div class="badge">💖 给贾银珠的专属抽奖</div>
           <h1>今天的小惊喜等你来抽</h1>
-          <p>每次只能抽一个，抽中后自动锁定。</p>
+          <p>每次只能抽一个，抽中后永久锁定。</p>
           <div class="anniversary">📅 纪念日：2026年2月7日</div>
         </div>
 
@@ -348,7 +348,6 @@
 
         <div class="controls">
           <button class="primary" id="spinBtn">开始抽奖</button>
-          <button class="secondary" id="resetBtn">重新开始</button>
         </div>
 
         <div class="result-box">
@@ -359,7 +358,7 @@
 
         <div class="share-box">
           <div class="share-title">直接发送方式</div>
-          <div class="share-tip">把这个文件保存成 <b>gift.html</b>，然后通过微信“文件”发给她。她下载后点开，用手机浏览器打开就能玩。</div>
+          <div class="share-tip">把这个文件保存成 <b>gift.html</b>，然后通过微信“文件”发给她。她下载后点开，用手机浏览器打开就能玩。同一设备同一浏览器只允许抽一次。</div>
         </div>
       </div>
     </div>
@@ -379,6 +378,8 @@
     ];
 
     const SPIN_DURATION_MS = 5000;
+    const DRAW_STORAGE_KEY = "gift-spin-wheel-drawn-v1";
+    const DRAW_RESULT_KEY = "gift-spin-wheel-result-v1";
     const HEARTS = [
       { left: "14%", delay: 0, duration: 7.8, size: 16 },
       { left: "30%", delay: 1.2, duration: 8.1, size: 18 },
@@ -393,6 +394,43 @@
 
     function getWinnerIndex(count) {
       return Math.floor(Math.random() * count);
+    }
+
+    function getStoredDrawState() {
+      try {
+        return window.localStorage.getItem(DRAW_STORAGE_KEY) === "done";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function getStoredDrawResult() {
+      try {
+        return window.localStorage.getItem(DRAW_RESULT_KEY) || "";
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function setStoredDrawResult(result) {
+      try {
+        window.localStorage.setItem(DRAW_RESULT_KEY, result);
+      } catch (error) {
+        // ignore storage write failures
+      }
+    }
+
+    function setStoredDrawState(drawn) {
+      try {
+        if (drawn) {
+          window.localStorage.setItem(DRAW_STORAGE_KEY, "done");
+        } else {
+          window.localStorage.removeItem(DRAW_STORAGE_KEY);
+          window.localStorage.removeItem(DRAW_RESULT_KEY);
+        }
+      } catch (error) {
+        // ignore storage write failures
+      }
     }
 
     function buildBubbleOffsets(count) {
@@ -411,6 +449,10 @@
     function runTests() {
       assert(Array.isArray(GIFTS) && GIFTS.length > 1, "gift list should contain at least two items");
       assert(GIFTS.includes("一起玩游戏"), "gift list should include 一起玩游戏");
+      assert(typeof getStoredDrawState === "function", "getStoredDrawState should exist");
+      assert(typeof getStoredDrawResult === "function", "getStoredDrawResult should exist");
+      assert(typeof setStoredDrawState === "function", "setStoredDrawState should exist");
+      assert(typeof setStoredDrawResult === "function", "setStoredDrawResult should exist");
       const winner = getWinnerIndex(GIFTS.length);
       assert(winner >= 0 && winner < GIFTS.length, "winner index should stay within range");
       const offsets = buildBubbleOffsets(8);
@@ -421,7 +463,6 @@
 
     const wheel = document.getElementById("wheel");
     const spinBtn = document.getElementById("spinBtn");
-    const resetBtn = document.getElementById("resetBtn");
     const resultMain = document.getElementById("resultMain");
     const resultSub = document.getElementById("resultSub");
     const heartLayer = document.getElementById("heartLayer");
@@ -496,7 +537,19 @@
 
     function updateButtonState() {
       spinBtn.disabled = isSpinning || isDrawn;
-      spinBtn.textContent = isSpinning ? "正在抽奖..." : isDrawn ? "本轮已抽完" : "开始抽奖";
+      spinBtn.textContent = isSpinning ? "正在抽奖..." : isDrawn ? "已抽过，无法再次抽奖" : "开始抽奖";
+    }
+
+    function applyStoredState() {
+      if (!getStoredDrawState()) {
+        return;
+      }
+
+      isDrawn = true;
+      const storedResult = getStoredDrawResult();
+      resultMain.textContent = storedResult || "本设备已抽过一次";
+      resultSub.textContent = "关闭后再打开也不会恢复次数。";
+      updateButtonState();
     }
 
     function spin() {
@@ -521,37 +574,24 @@
       }
 
       timerId = window.setTimeout(() => {
+        const finalResult = `抽中：${GIFTS[winnerIndex]}`;
         isSpinning = false;
         isDrawn = true;
-        resultMain.textContent = `抽中：${GIFTS[winnerIndex]}`;
+        resultMain.textContent = finalResult;
         resultSub.textContent = "今天给贾银珠的小浪漫已经决定好啦。";
+        setStoredDrawResult(finalResult);
+        setStoredDrawState(true);
         updateButtonState();
         showBurst();
       }, SPIN_DURATION_MS);
     }
 
-    function reset() {
-      if (timerId !== null) {
-        window.clearTimeout(timerId);
-        timerId = null;
-      }
-      isSpinning = false;
-      isDrawn = false;
-      rotation = 0;
-      wheel.style.transition = "none";
-      wheel.style.transform = "rotate(0deg)";
-      resultMain.textContent = "点击开始抽奖";
-      resultSub.textContent = "看看今天送给贾银珠什么惊喜。";
-      burstLayer.innerHTML = "";
-      updateButtonState();
-    }
-
     spinBtn.addEventListener("click", spin);
-    resetBtn.addEventListener("click", reset);
 
     renderLabels();
     renderHearts();
     updateButtonState();
+    applyStoredState();
     runTests();
   </script>
 </body>
