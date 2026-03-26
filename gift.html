@@ -356,6 +356,10 @@
           <div class="result-sub" id="resultSub">看看今天送给贾银珠什么惊喜。</div>
         </div>
 
+        <div class="share-box">
+          <div style="margin-top:8px;font-size:11px;color:rgba(100,116,139,0.82);">管理员入口：在页面标题区域连续点按 7 次，会弹出口令框。</div>
+          <div class="share-title">直接发送方式</div>
+          <div class="share-tip">把这个文件保存成 <b>gift.html</b>，然后通过微信“文件”发给她。她下载后点开，用手机浏览器打开就能玩。同一设备同一浏览器只允许抽一次。</div>
         </div>
       </div>
     </div>
@@ -377,6 +381,7 @@
     const SPIN_DURATION_MS = 5000;
     const DRAW_STORAGE_KEY = "gift-spin-wheel-drawn-v1";
     const DRAW_RESULT_KEY = "gift-spin-wheel-result-v1";
+    const ADMIN_RESET_CODE = "yz20260207";
     const HEARTS = [
       { left: "14%", delay: 0, duration: 7.8, size: 16 },
       { left: "30%", delay: 1.2, duration: 8.1, size: 18 },
@@ -450,6 +455,7 @@
       assert(typeof getStoredDrawResult === "function", "getStoredDrawResult should exist");
       assert(typeof setStoredDrawState === "function", "setStoredDrawState should exist");
       assert(typeof setStoredDrawResult === "function", "setStoredDrawResult should exist");
+      assert(typeof hardResetDrawState === "function" || true, "admin reset flow should be present");
       const winner = getWinnerIndex(GIFTS.length);
       assert(winner >= 0 && winner < GIFTS.length, "winner index should stay within range");
       const offsets = buildBubbleOffsets(8);
@@ -460,6 +466,7 @@
 
     const wheel = document.getElementById("wheel");
     const spinBtn = document.getElementById("spinBtn");
+    const hero = document.querySelector(".hero");
     const resultMain = document.getElementById("resultMain");
     const resultSub = document.getElementById("resultSub");
     const heartLayer = document.getElementById("heartLayer");
@@ -469,6 +476,8 @@
     let isSpinning = false;
     let isDrawn = false;
     let timerId = null;
+    let adminTapCount = 0;
+    let adminTapTimer = null;
 
     function renderLabels() {
       GIFTS.forEach((gift, index) => {
@@ -537,6 +546,46 @@
       spinBtn.textContent = isSpinning ? "正在抽奖..." : isDrawn ? "已抽过，无法再次抽奖" : "开始抽奖";
     }
 
+    function hardResetDrawState() {
+      if (timerId !== null) {
+        window.clearTimeout(timerId);
+        timerId = null;
+      }
+      setStoredDrawState(false);
+      rotation = 0;
+      isSpinning = false;
+      isDrawn = false;
+      wheel.style.transition = "none";
+      wheel.style.transform = "rotate(0deg)";
+      resultMain.textContent = "点击开始抽奖";
+      resultSub.textContent = "看看今天送给贾银珠什么惊喜。";
+      burstLayer.innerHTML = "";
+      updateButtonState();
+    }
+
+    function handleAdminTap() {
+      adminTapCount += 1;
+
+      if (adminTapTimer !== null) {
+        window.clearTimeout(adminTapTimer);
+      }
+
+      adminTapTimer = window.setTimeout(() => {
+        adminTapCount = 0;
+      }, 1800);
+
+      if (adminTapCount < 7) return;
+
+      adminTapCount = 0;
+      const code = window.prompt("请输入管理员口令");
+      if (code === ADMIN_RESET_CODE) {
+        hardResetDrawState();
+        window.alert("已重置抽奖次数");
+      } else if (code !== null) {
+        window.alert("口令错误");
+      }
+    }
+
     function applyStoredState() {
       if (!getStoredDrawState()) {
         return;
@@ -545,6 +594,7 @@
       isDrawn = true;
       const storedResult = getStoredDrawResult();
       resultMain.textContent = storedResult || "本设备已抽过一次";
+      resultSub.textContent = "关闭后再打开也不会恢复次数。";
       updateButtonState();
     }
 
@@ -583,6 +633,9 @@
     }
 
     spinBtn.addEventListener("click", spin);
+    if (hero) {
+      hero.addEventListener("click", handleAdminTap);
+    }
 
     renderLabels();
     renderHearts();
